@@ -47,7 +47,7 @@ services:
       - 3000:3000
 
   web:
-    image: apotheddy/crud-users-web:1.0.8
+    image: apotheddy/crud-users-web:1.0.9
     container_name: web
     restart: always
     networks:
