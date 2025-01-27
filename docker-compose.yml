@@ -1,0 +1,65 @@
+services:
+  db:
+    container_name: db_mrcash
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      TZ: America/Lima
+    ports:
+      - 3306:3306
+    restart: always
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - mrcash_network
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    environment:
+      PMA_HOST: db
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+    restart: always
+    ports:
+      - 8080:80
+    depends_on:
+      - db
+    networks:
+      - mrcash_network
+
+  app:
+    image: apotheddy/mrcash-crud-users:1.0.0
+    container_name: crud_users
+    restart: always
+    networks:
+      - mrcash_network
+    depends_on:
+      - db
+    environment:
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+    ports:
+      - 3000:3000
+
+  web:
+    image: apotheddy/crud-users-web:1.0.8
+    container_name: web
+    restart: always
+    networks:
+      - mrcash_network
+    ports:
+      - 5173:5173
+    depends_on:
+      - app
+
+volumes:
+  db_data:
+
+
+networks:
+  mrcash_network:
